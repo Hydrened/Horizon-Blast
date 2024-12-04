@@ -17,20 +17,20 @@ void Game::createWindow() {
     int h = 720;
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        throw std::runtime_error("HS-101: Error creating window => SDL_Init failed: " + std::string(SDL_GetError()));
+        throw std::runtime_error("HB-101: Error creating window => SDL_Init failed: " + std::string(SDL_GetError()));
     }
 
-    window = SDL_CreateWindow("Hydren Shooter 1.0.0", x, y, w, h, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Horizon Blast 1.0.1", x, y, w, h, SDL_WINDOW_SHOWN);
     if (!window) {
         SDL_Quit();
-        throw std::runtime_error("HS-102: Error creating window => SDL_CreateWindow failed: " + std::string(SDL_GetError()));
+        throw std::runtime_error("HB-102: Error creating window => SDL_CreateWindow failed: " + std::string(SDL_GetError()));
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer) {
         SDL_DestroyWindow(window);
         SDL_Quit();
-        throw std::runtime_error("HS-103: Error creating window => SDL_CreateRenderer failed: " + std::string(SDL_GetError()));
+        throw std::runtime_error("HB-103: Error creating window => SDL_CreateRenderer failed: " + std::string(SDL_GetError()));
     }
 
     engine = H2DE_CreateEngine(renderer, w, h, FPS);
@@ -38,7 +38,7 @@ void Game::createWindow() {
         SDL_DestroyWindow(window);
         SDL_DestroyRenderer(renderer);
         SDL_Quit();
-        throw std::runtime_error("HS-104: Error creating window => H2DE_CreateEngine failed");
+        throw std::runtime_error("HB-104: Error creating window => H2DE_CreateEngine failed");
     }
 
     SDL_SetWindowMaximumSize(window, w, h);
@@ -86,7 +86,7 @@ void Game::handleEvents(SDL_Event event) {
         case SDL_KEYDOWN: keyPressed[event.key.keysym.sym] = true; break;
         case SDL_KEYUP: keyPressed[event.key.keysym.sym] = false; break;
         case SDL_MOUSEBUTTONDOWN: if (event.button.button == SDL_BUTTON_LEFT) switch (state) {
-            case PLAYING: player->shot(calculator->convertToLevelPos(event.button.x, event.button.y, { 10, 10 })); break;
+            case PLAYING: player->shot(calculator->computePxPos(event.button.x, event.button.y)); break;
             default: break;
         } break;
         default: break;
@@ -108,12 +108,20 @@ H2DE_Engine* Game::getEngine() {
     return engine;
 }
 
+GameData* Game::getData() {
+    return data;
+}
+
 Calculator* Game::getCalculator() {
     return calculator;
 }
 
 Camera* Game::getCamera() {
     return camera;
+}
+
+Map* Game::getMap() {
+    return map;
 }
 
 GameState Game::getState() {

@@ -5,7 +5,7 @@ BIN_DIR = bin
 INCLUDE_DIR = include
 LIB_DIR = lib
 SDL_TAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_gfx -lSDL2_ttf
-APP_NAME = Shooter.exe
+APP_NAME = Horizon_Shooter.exe
 
 all:
 	make game

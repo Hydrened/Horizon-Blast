@@ -8,11 +8,13 @@ class Camera {
 private:
     Game* game;
 
-    LevelPos pos = { -9.5, 0 };
+    LevelPos pos;
 
 public:
     Camera(Game* game);
     ~Camera();
+
+    void update();
 
     LevelPos getPos();
     void setPos(LevelPos pos);

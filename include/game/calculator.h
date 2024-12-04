@@ -17,7 +17,7 @@ public:
     H2DE_Pos convertToPx(LevelPos pos, LevelSize size);
     H2DE_Size convertToPx(LevelSize size);
 
-    LevelPos convertToLevelPos(int x, int y, LevelSize size);
+    LevelPos computePxPos(int x, int y);
 };
 
 #endif

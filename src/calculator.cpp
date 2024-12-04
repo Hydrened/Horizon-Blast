@@ -18,8 +18,8 @@ H2DE_Pos Calculator::convertToPx(LevelPos p, LevelSize s) {
     LevelPos c = game->getCamera()->getPos();
 
     return {
-        (int)((p.x - c.x) * blockSize),
-        (int)(engineSize.h - (p.y - c.y + s.h) * blockSize)
+        (int)((p.x - c.x - s.w / 2) * blockSize),
+        (int)(engineSize.h - (p.y - c.y + s.h / 2) * blockSize)
     };
 }
 
@@ -34,8 +34,8 @@ H2DE_Size Calculator::convertToPx(LevelSize s) {
     };
 }
 
-// CONVERT TO LEVEL
-LevelPos Calculator::convertToLevelPos(int x, int y, LevelSize s) {
+// COMPUTE
+LevelPos Calculator::computePxPos(int x, int y) {
     H2DE_Size engineSize;
     int blockSize;
     getUtils(&engineSize, &blockSize);
@@ -43,7 +43,7 @@ LevelPos Calculator::convertToLevelPos(int x, int y, LevelSize s) {
 
     return {
         (float)x / blockSize + c.x,
-        (float)(engineSize.h - y) / blockSize + c.y - s.h
+        (float)(engineSize.h - y) / blockSize + c.y
     };
 }
 

@@ -20,6 +20,7 @@ private:
     unsigned int FPS;
     bool isRunning = true;
 
+    GameData* data = new GameData();
     std::unordered_map<SDL_Keycode, bool> keyPressed;
 
     Calculator* calculator = nullptr;
@@ -28,20 +29,23 @@ private:
     GameState state = PLAYING;
 
     void createWindow();
+    void quit();
+
+    void handleEvents(SDL_Event event);
+    void update();
+    void render();
 
 public:
     Game(unsigned int fps);
     ~Game();
 
     void run();
-    void quit();
-    void handleEvents(SDL_Event event);
-    void update();
-    void render();
 
     H2DE_Engine* getEngine();
+    GameData* getData();
     Calculator* getCalculator();
     Camera* getCamera();
+    Map* getMap();
     GameState getState();
     std::vector<SDL_Keycode> getPressedKeys();
 };

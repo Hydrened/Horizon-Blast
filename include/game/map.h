@@ -12,6 +12,7 @@ private:
 
     std::unordered_map<unsigned int, LevelData*> levels;
     Player* player;
+    std::vector<Item*> items;
 
     void loadData();
 
@@ -23,6 +24,7 @@ public:
     void render();
 
     Player* getPlayer();
+    std::vector<Item*>* getItems();
 };
 
 #endif
