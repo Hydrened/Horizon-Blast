@@ -21,7 +21,9 @@ private:
     bool isRunning = true;
 
     GameData* data = new GameData();
+
     std::unordered_map<SDL_Keycode, bool> keyPressed;
+    H2DE_Pos mousePos = { 0, 0 };
 
     Calculator* calculator = nullptr;
     Camera* camera = nullptr;
@@ -48,6 +50,7 @@ public:
     Map* getMap();
     GameState getState();
     std::vector<SDL_Keycode> getPressedKeys();
+    H2DE_Pos getMousePos();
 };
 
 #endif

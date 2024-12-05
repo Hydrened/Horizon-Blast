@@ -3,29 +3,28 @@
 
 #include "game.h"
 #include "map.h"
-#include "bullet.h"
+#include "weapon.h"
 class Game;
 class Map;
-class Bullet;
+class Weapon;
 
 class Player {
 private:
     Game* game;
-    Map* map;
 
     LevelPos pos;
-    std::vector<Bullet*> bullets;
+    Weapon* weapon;
 
 public:
-    Player(Game* game, Map* map);
+    Player(Game* game, Weapon* weapon);
     ~Player();
 
     void update();
     void render();
 
-    void shot(LevelPos pos);
-
-    std::vector<Bullet*>* getBullets();
+    LevelPos getPos();
+    Weapon* getWeapon();
+    void setShooting(bool value);
 };
 
 #endif

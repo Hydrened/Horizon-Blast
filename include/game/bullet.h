@@ -15,7 +15,7 @@ private:
     H2DE_TimelineManager* tm = H2DE_CreateTimelineManager();
 
 public:
-    Bullet(Game* game, LevelPos start, LevelPos end, BulletData data);
+    Bullet(Game* game, BulletData data, LevelPos start, LevelPos end);
     ~Bullet();
 
     void update();

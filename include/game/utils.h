@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+class Bullet;
+
 enum GameState {
     MENU,
     PLAYING,
@@ -11,6 +13,13 @@ enum ItemType {
     GROUND = 0,
     WALL = 1,
     HOLE = 2,
+};
+
+enum Face {
+    NORTH,
+    EAST,
+    SOUTH,
+    WEST,
 };
 
 struct LevelPos {
@@ -32,24 +41,42 @@ struct LevelRect {
 
         return (pos.x >= left && pos.x <= right && pos.y >= top && pos.y <= bottom);
     }
-};
 
-struct Rotation {
-    float x, y;
-};
+    bool intersect(LevelRect rect) {
+        float leftA = x - w / 2.0f;
+        float rightA = x + w / 2.0f;
+        float topA = y - h / 2.0f;
+        float bottomA = y + h / 2.0f;
 
-struct Translate {
-    float x, y;
-};
+        float leftB = rect.x - rect.w / 2.0f;
+        float rightB = rect.x + rect.w / 2.0f;
+        float topB = rect.y - rect.h / 2.0f;
+        float bottomB = rect.y + rect.h / 2.0f;
 
-struct Scale {
-    float x, y;
-};
+        return !(leftA > rightB || rightA < leftB || topA > bottomB || bottomA < topB);
+    }
 
-struct Transform {
-    Rotation rotation;
-    Translate translate;
-    Scale scale;
+    Face getCollidedFace(LevelRect rect) {
+        float leftA = x - w / 2.0f;
+        float rightA = x + w / 2.0f;
+        float topA = y - h / 2.0f;
+        float bottomA = y + h / 2.0f;
+
+        float leftB = rect.x - rect.w / 2.0f;
+        float rightB = rect.x + rect.w / 2.0f;
+        float topB = rect.y - rect.h / 2.0f;
+        float bottomB = rect.y + rect.h / 2.0f;
+
+        float overlapLeft = rightA - leftB;
+        float overlapRight = rightB - leftA;
+        float overlapTop = bottomA - topB;
+        float overlapBottom = bottomB - topA;
+
+        if (overlapTop <= overlapBottom && overlapTop <= overlapLeft && overlapTop <= overlapRight) return NORTH;
+        else if (overlapBottom <= overlapTop && overlapBottom <= overlapLeft && overlapBottom <= overlapRight) return SOUTH;
+        else if (overlapLeft <= overlapRight && overlapLeft <= overlapTop && overlapLeft <= overlapBottom) return WEST;
+        else return EAST;
+    }
 };
 
 struct LevelData {
@@ -62,14 +89,16 @@ struct BulletData {
     int rebound = 0;
     bool pierce = false;
     bool explosive = false;
-    Transform tranform;
+};
+
+struct WeaponData {
+    unsigned int delay;
+    std::vector<BulletData> bullets;
 };
 
 struct Item {
     ItemType type;
     LevelPos pos;
-
-    LevelRect getRect() { return { pos.x - 0.5f, pos.y -0.5f, 1.0f, 1.0f }; }
 };
 
 #endif

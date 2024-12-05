@@ -1,6 +1,6 @@
 #include "bullet.h"
 
-Bullet::Bullet(Game* g, LevelPos s, LevelPos e, BulletData d) : game(g), start(s), end(e), pos(s), data(d) {
+Bullet::Bullet(Game* g, BulletData d, LevelPos s, LevelPos e) : game(g), data(d), start(s), end(e), pos(s) {
     static GameData* gameData = game->getData();
 
     H2DE_AddTimelineToManager(tm, H2DE_CreateTimeline(g->getEngine(), static_cast<unsigned int>(gameData->physics->bulletDuration / data.speed), LINEAR, [this](float blend) {
@@ -10,8 +10,8 @@ Bullet::Bullet(Game* g, LevelPos s, LevelPos e, BulletData d) : game(g), start(s
 }
 
 Bullet::~Bullet() {
-    std::vector<Bullet*>* bullets = game->getMap()->getPlayer()->getBullets();
-    bullets->erase(std::remove(bullets->begin(), bullets->end(), this), bullets->end());
+    static Weapon* weapon = game->getMap()->getPlayer()->getWeapon();
+    weapon->destroyBullet(this);
     H2DE_DestroyTimelineManager(tm);
 }
 

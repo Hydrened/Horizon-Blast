@@ -11,6 +11,7 @@ struct GameData {
 
     struct Sizes {
         LevelSize player = { 1.0f, 1.0f };
+        LevelSize item = { 1.0f, 1.0f };
         LevelSize bullet = { 0.2f, 0.2f };
         float cameraPadding = 3.0f;
     };

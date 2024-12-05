@@ -1,7 +1,7 @@
 #include "player.h"
 
 // INIT
-Player::Player(Game* g, Map* m) : game(g), map(m) {
+Player::Player(Game* g, Weapon* w) : game(g), weapon(w) {
     static GameData* gameData = game->getData();
     pos = gameData->positions->player;
 }
@@ -19,23 +19,37 @@ void Player::update() {
     static float BLOCKS_ON_HEIGHT = BLOCKS_ON_WIDTH * 9 / 16;
     static float speed = gameData->physics->playerSpeed;
     static float camPadding = gameData->sizes->cameraPadding;
-    static LevelSize itemSize = { 1.0f, 1.0f };
+    static LevelSize playerSize = gameData->sizes->player;
+    static LevelSize itemSize = gameData->sizes->item;
 
     if (game->getState() != PLAYING) return;
 
     // 1 => Movements
-    std::vector<Item*>* items = game->getMap()->getItems();
-    for (const SDL_Keycode key : game->getPressedKeys()) {
-        switch (key) {
-            case SDLK_UP: pos.y += speed; break;
-            case SDLK_RIGHT: pos.x += speed; break;
-            case SDLK_DOWN: pos.y -= speed; break;
-            case SDLK_LEFT: pos.x -= speed; break;
+    for (const SDL_Keycode key : game->getPressedKeys()) switch (key) {
+        case SDLK_UP: pos.y += speed; break;
+        case SDLK_RIGHT: pos.x += speed; break;
+        case SDLK_DOWN: pos.y -= speed; break;
+        case SDLK_LEFT: pos.x -= speed; break;
+        default: break;
+    }
+
+    // 2 => Snap if collision
+    LevelRect playerRect = getRect(pos, playerSize);
+    for (const Item* item : *(game->getMap()->getItems())) if (item->type != GROUND) {
+        LevelRect itemRect = getRect(item->pos, itemSize);
+        if (!playerRect.intersect(itemRect)) continue;
+
+        switch (playerRect.getCollidedFace(itemRect)) {
+            case NORTH: pos.y = item->pos.y - itemSize.h / 2.0f - playerSize.h / 2.0f; break;
+            case EAST: pos.x = item->pos.x + itemSize.w / 2.0f + playerSize.w / 2.0f; break;
+            case SOUTH: pos.y = item->pos.y + itemSize.h / 2.0f + playerSize.h / 2.0f; break;
+            case WEST: pos.x = item->pos.x - itemSize.w / 2.0f - playerSize.w / 2.0f; break;
             default: break;
         }
     }
+    playerRect = getRect(pos, playerSize);
 
-    // 2 => Camera
+    // 3 => Camera
     LevelPos camPos = camera->getPos();
     if (camPos.x + camPadding > pos.x) camPos = { pos.x - camPadding, camPos.y };
     if (camPos.x + BLOCKS_ON_WIDTH - camPadding < pos.x) camPos = { pos.x + camPadding - BLOCKS_ON_WIDTH, camPos.y };
@@ -43,8 +57,8 @@ void Player::update() {
     if (camPos.y + BLOCKS_ON_HEIGHT - camPadding < pos.y) camPos = { camPos.x, pos.y + camPadding - BLOCKS_ON_HEIGHT };
     camera->setPos(camPos);
 
-    // 3 => Bullets
-    for (Bullet* bullet : bullets) bullet->update();
+    // 4 => Weapon
+    weapon->update();
 }
 
 // RENDER
@@ -69,25 +83,19 @@ void Player::render() {
     a->index = 10;
     H2DE_AddGraphicObject(engine, a);
 
-    for (Bullet* bullet : bullets) bullet->render();
+    weapon->render();
 }
 
-// EVENTS
-void Player::shot(LevelPos p) {
-    static H2DE_Engine* engine = game->getEngine();
-    static float bulletRange = game->getData()->physics->bulletRange;
-
-    double angle = std::atan2(p.y - pos.y, p.x - pos.x);
-    LevelPos start = pos;
-    LevelPos end = { pos.x + bulletRange * static_cast<float>(std::cos(angle)), pos.y + bulletRange * static_cast<float>(std::sin(angle)) };
-
-    BulletData bulletData = BulletData();
-    bulletData.speed = 1.2f;
-
-    bullets.push_back(new Bullet(game, start, end, bulletData));
+// GETTER
+LevelPos Player::getPos() {
+    return pos;
 }
 
-//GETTER
-std::vector<Bullet*>* Player::getBullets() {
-    return &bullets;
+Weapon* Player::getWeapon() {
+    return weapon;
+}
+
+// SETTER
+void Player::setShooting(bool value) {
+    weapon->setShooting(value);
 }

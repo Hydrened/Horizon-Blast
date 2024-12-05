@@ -20,7 +20,7 @@ void Game::createWindow() {
         throw std::runtime_error("HB-101: Error creating window => SDL_Init failed: " + std::string(SDL_GetError()));
     }
 
-    window = SDL_CreateWindow("Horizon Blast 1.0.1", x, y, w, h, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Horizon Blast 1.0.2", x, y, w, h, SDL_WINDOW_SHOWN);
     if (!window) {
         SDL_Quit();
         throw std::runtime_error("HB-102: Error creating window => SDL_CreateWindow failed: " + std::string(SDL_GetError()));
@@ -83,12 +83,22 @@ void Game::handleEvents(SDL_Event event) {
 
     while (SDL_PollEvent(&event)) switch (event.type) {
         case SDL_QUIT: quit(); break;
-        case SDL_KEYDOWN: keyPressed[event.key.keysym.sym] = true; break;
+        case SDL_KEYDOWN:
+            keyPressed[event.key.keysym.sym] = true;
+            switch (event.key.keysym.sym) {
+                case SDLK_ESCAPE: quit(); break;
+                default: break;
+            } break;
         case SDL_KEYUP: keyPressed[event.key.keysym.sym] = false; break;
         case SDL_MOUSEBUTTONDOWN: if (event.button.button == SDL_BUTTON_LEFT) switch (state) {
-            case PLAYING: player->shot(calculator->computePxPos(event.button.x, event.button.y)); break;
+            case PLAYING: player->setShooting(true); break;
             default: break;
         } break;
+        case SDL_MOUSEBUTTONUP: if (event.button.button == SDL_BUTTON_LEFT) switch (state) {
+            case PLAYING: player->setShooting(false); break;
+            default: break;
+        } break;
+        case SDL_MOUSEMOTION: mousePos = { event.button.x, event.button.y }; break;
         default: break;
     }
 }
@@ -132,4 +142,8 @@ std::vector<SDL_Keycode> Game::getPressedKeys() {
     std::vector<SDL_Keycode> res;
     for (const auto& [key, value] : keyPressed) if (value) res.push_back(key);
     return res;
+}
+
+H2DE_Pos Game::getMousePos() {
+    return mousePos;
 }
