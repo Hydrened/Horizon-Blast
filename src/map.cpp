@@ -6,7 +6,8 @@ Map::Map(Game* g) : game(g) {
 
     BulletData bulletData = BulletData();
     bulletData.damage = 1.0f;
-    bulletData.speed = 1.0f;
+    bulletData.speed = 2.0f;
+    bulletData.rebound = 10;
 
     WeaponData weaponData = WeaponData();
     weaponData.delay = 100;

@@ -35,11 +35,11 @@ void Weapon::shot(LevelPos pos) {
 
     LevelPos playerPos = player->getPos();
     double angle = std::atan2(pos.y - playerPos.y, pos.x - playerPos.x);
-    
-    LevelPos start = playerPos;
-    LevelPos end = { playerPos.x + bulletRange * static_cast<float>(std::cos(angle)), playerPos.y + bulletRange * static_cast<float>(std::sin(angle)) };
 
-    for (BulletData bData : data.bullets) bullets.push_back(new Bullet(game, bData, start, end));
+    for (BulletData bData : data.bullets) {
+        LevelVelocity bulletVelocity = { static_cast<float>(std::cos(angle)) / 10.0f, static_cast<float>(std::sin(angle)) / 10.0f };
+        bullets.push_back(new Bullet(game, bData, playerPos, bulletVelocity));
+    }
 }
 
 void Weapon::destroyBullet(Bullet* bullet) {

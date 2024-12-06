@@ -47,7 +47,6 @@ void Player::update() {
             default: break;
         }
     }
-    playerRect = getRect(pos, playerSize);
 
     // 3 => Camera
     LevelPos camPos = camera->getPos();

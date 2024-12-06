@@ -7,15 +7,14 @@ class Game;
 class Bullet {
 private:
     Game* game;
-    LevelPos start;
-    LevelPos end;
-    LevelPos pos;
     BulletData data;
+    LevelPos pos;
+    LevelVelocity velocity;
 
-    H2DE_TimelineManager* tm = H2DE_CreateTimelineManager();
+    int reboundsLeft;
 
 public:
-    Bullet(Game* game, BulletData data, LevelPos start, LevelPos end);
+    Bullet(Game* game, BulletData data, LevelPos start, LevelVelocity velocity);
     ~Bullet();
 
     void update();

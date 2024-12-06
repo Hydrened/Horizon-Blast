@@ -1,24 +1,54 @@
 #include "bullet.h"
 
-Bullet::Bullet(Game* g, BulletData d, LevelPos s, LevelPos e) : game(g), data(d), start(s), end(e), pos(s) {
-    static GameData* gameData = game->getData();
+// INIT
+Bullet::Bullet(Game* g, BulletData d, LevelPos s, LevelVelocity v) : game(g), data(d), pos(s), velocity(v), reboundsLeft(d.rebound) {
 
-    H2DE_AddTimelineToManager(tm, H2DE_CreateTimeline(g->getEngine(), static_cast<unsigned int>(gameData->physics->bulletDuration / data.speed), LINEAR, [this](float blend) {
-        pos.x = lerp(start.x, end.x, blend);
-        pos.y = lerp(start.y, end.y, blend);
-    }, [this]() { delete this; }, 0));
 }
 
+// CLEANUP
 Bullet::~Bullet() {
-    static Weapon* weapon = game->getMap()->getPlayer()->getWeapon();
+    Weapon* weapon = game->getMap()->getPlayer()->getWeapon();
     weapon->destroyBullet(this);
-    H2DE_DestroyTimelineManager(tm);
 }
 
+// UPDATE
 void Bullet::update() {
-    H2DE_TickTimelineManager(tm);
+    static GameData* gameData = game->getData();
+    Weapon* weapon = game->getMap()->getPlayer()->getWeapon();
+
+    static LevelSize mapSize = gameData->sizes->map;
+    static LevelSize bulletSize = gameData->sizes->bullet; 
+    static LevelSize itemSize = gameData->sizes->item; 
+
+    if (game->getState() != PLAYING) return;
+
+    // 1 => Update positions
+    pos.x += velocity.x * data.speed;
+    pos.y += velocity.y * data.speed;
+
+    // 2 => World limits
+    if (std::abs(pos.x) > mapSize.w || std::abs(pos.y) > mapSize.h) weapon->destroyBullet(this);
+
+    // 3 => Check wall collisions
+    LevelRect bulletRect = getRect(pos, bulletSize);
+    for (const Item* item : *(game->getMap()->getItems())) if (item->type != GROUND) {
+        LevelRect itemRect = getRect(item->pos, itemSize);
+        if (!bulletRect.intersect(itemRect)) continue;
+
+        if (reboundsLeft != 0) {
+            switch (bulletRect.getCollidedFace(itemRect)) {
+                case NORTH: velocity.y *= -1; pos.y += velocity.y; break;
+                case EAST: velocity.x *= -1; pos.x += velocity.x; break;
+                case SOUTH: velocity.y *= -1; pos.y += velocity.y; break;
+                case WEST: velocity.x *= -1; pos.x += velocity.x; break;
+                default: break;
+            }
+            reboundsLeft--;
+        } else weapon->destroyBullet(this);
+    }
 }
 
+// RENDER
 void Bullet::render() {
     static H2DE_Engine* engine = game->getEngine();
     static Calculator* c = game->getCalculator();
@@ -36,6 +66,6 @@ void Bullet::render() {
     };
     a->rgb = { 0, 255, 0, 255 };
     a->filled = true;
-    a->index = 9;
+    a->index = 900;
     H2DE_AddGraphicObject(engine, a);
 }

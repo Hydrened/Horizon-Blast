@@ -30,6 +30,10 @@ struct LevelSize {
     float w, h;
 };
 
+struct LevelVelocity {
+    float x, y;
+};
+
 struct LevelRect {
     float x, y, w, h;
 
@@ -83,10 +87,12 @@ struct LevelData {
     unsigned int id;
 };
 
+// using CanDamage = std::variant<Player>;
 struct BulletData {
+    // std::vector<CanDamage> canDamage;
     float speed = 1.0f;
     float damage = 1.0f;
-    int rebound = 0;
+    unsigned int rebound = 0;
     bool pierce = false;
     bool explosive = false;
 };
