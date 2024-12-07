@@ -2,17 +2,19 @@
 #define MAP_H
 
 #include "game.h"
-#include "player.h"
+#include "entity.h"
 class Game;
 class Player;
+class Enemy;
 
 class Map {
 private:
     Game* game;
 
     std::unordered_map<unsigned int, LevelData*> levels;
-    Player* player;
     std::vector<Item*> items;
+    Player* player;
+    std::vector<Enemy*> enemies;
 
     void loadData();
 
@@ -23,7 +25,7 @@ public:
     void update();
     void render();
 
-    Player* getPlayer();
+    Player* getPlayer() const;
     std::vector<Item*>* getItems();
 };
 

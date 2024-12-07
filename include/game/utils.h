@@ -37,7 +37,7 @@ struct LevelVelocity {
 struct LevelRect {
     float x, y, w, h;
 
-    bool intersect(LevelPos pos) {
+    bool intersect(LevelPos pos) const {
         float left = x - w / 2.0f;
         float right = x + w / 2.0f;
         float top = y - h / 2.0f;
@@ -46,11 +46,15 @@ struct LevelRect {
         return (pos.x >= left && pos.x <= right && pos.y >= top && pos.y <= bottom);
     }
 
-    bool intersect(LevelRect rect) {
-        float leftA = x - w / 2.0f;
-        float rightA = x + w / 2.0f;
-        float topA = y - h / 2.0f;
-        float bottomA = y + h / 2.0f;
+    bool intersect(LevelRect rect) const {
+        return intersect(rect, { 0.0f, 0.0f });
+    }
+
+    bool intersect(LevelRect rect, LevelVelocity velocity) const {
+        float leftA = std::min(x - w / 2.0f, (x + velocity.x) - w / 2.0f);
+        float rightA = std::max(x + w / 2.0f, (x + velocity.x) + w / 2.0f);
+        float topA = std::min(y - h / 2.0f, (y + velocity.y) - h / 2.0f);
+        float bottomA = std::max(y + h / 2.0f, (y + velocity.y) + h / 2.0f);
 
         float leftB = rect.x - rect.w / 2.0f;
         float rightB = rect.x + rect.w / 2.0f;
@@ -60,11 +64,15 @@ struct LevelRect {
         return !(leftA > rightB || rightA < leftB || topA > bottomB || bottomA < topB);
     }
 
-    Face getCollidedFace(LevelRect rect) {
-        float leftA = x - w / 2.0f;
-        float rightA = x + w / 2.0f;
-        float topA = y - h / 2.0f;
-        float bottomA = y + h / 2.0f;
+    Face getCollidedFace(LevelRect rect) const {
+        return getCollidedFace(rect, { 0.0f, 0.0f });
+    }
+
+    Face getCollidedFace(LevelRect rect, LevelVelocity velocity) const {
+        float leftA = std::min(x - w / 2.0f, (x + velocity.x) - w / 2.0f);
+        float rightA = std::max(x + w / 2.0f, (x + velocity.x) + w / 2.0f);
+        float topA = std::min(y - h / 2.0f, (y + velocity.y) - h / 2.0f);
+        float bottomA = std::max(y + h / 2.0f, (y + velocity.y) + h / 2.0f);
 
         float leftB = rect.x - rect.w / 2.0f;
         float rightB = rect.x + rect.w / 2.0f;
@@ -87,7 +95,6 @@ struct LevelData {
     unsigned int id;
 };
 
-// using CanDamage = std::variant<Player>;
 struct BulletData {
     // std::vector<CanDamage> canDamage;
     float speed = 1.0f;
@@ -95,6 +102,7 @@ struct BulletData {
     unsigned int rebound = 0;
     bool pierce = false;
     bool explosive = false;
+    float angle = 0.0f;
 };
 
 struct WeaponData {

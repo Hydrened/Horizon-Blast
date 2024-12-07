@@ -1,7 +1,7 @@
 #include "bullet.h"
 
 // INIT
-Bullet::Bullet(Game* g, BulletData d, LevelPos s, LevelVelocity v) : game(g), data(d), pos(s), velocity(v), reboundsLeft(d.rebound) {
+Bullet::Bullet(Game* g, Weapon* w, BulletData d, LevelPos s, LevelVelocity v) : game(g), weapon(w), data(d), pos(s), velocity(v), reboundsLeft(d.rebound) {
 
 }
 
@@ -14,7 +14,6 @@ Bullet::~Bullet() {
 // UPDATE
 void Bullet::update() {
     static GameData* gameData = game->getData();
-    Weapon* weapon = game->getMap()->getPlayer()->getWeapon();
 
     static LevelSize mapSize = gameData->sizes->map;
     static LevelSize bulletSize = gameData->sizes->bullet; 
@@ -31,16 +30,16 @@ void Bullet::update() {
 
     // 3 => Check wall collisions
     LevelRect bulletRect = getRect(pos, bulletSize);
-    for (const Item* item : *(game->getMap()->getItems())) if (item->type != GROUND) {
+    for (const Item* item : *(game->getMap()->getItems())) if (item->type == WALL) {
         LevelRect itemRect = getRect(item->pos, itemSize);
-        if (!bulletRect.intersect(itemRect)) continue;
+        if (!bulletRect.intersect(itemRect, velocity)) continue;
 
         if (reboundsLeft != 0) {
-            switch (bulletRect.getCollidedFace(itemRect)) {
-                case NORTH: velocity.y *= -1; pos.y += velocity.y; break;
-                case EAST: velocity.x *= -1; pos.x += velocity.x; break;
-                case SOUTH: velocity.y *= -1; pos.y += velocity.y; break;
-                case WEST: velocity.x *= -1; pos.x += velocity.x; break;
+            switch (bulletRect.getCollidedFace(itemRect, velocity)) {
+                case NORTH: velocity.y *= -1; break;
+                case EAST: velocity.x *= -1; break;
+                case SOUTH: velocity.y *= -1; break;
+                case WEST: velocity.x *= -1; break;
                 default: break;
             }
             reboundsLeft--;
@@ -64,8 +63,8 @@ void Bullet::render() {
         { size.w, size.h },
         { 0, size.h },
     };
-    a->rgb = { 0, 255, 0, 255 };
+    a->rgb = { 128, 128, 255, 255 };
     a->filled = true;
-    a->index = 900;
+    a->index = 9;
     H2DE_AddGraphicObject(engine, a);
 }

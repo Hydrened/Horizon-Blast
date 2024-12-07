@@ -2,12 +2,15 @@
 #define WEAPON_H
 
 #include "game.h"
+#include "entity.h"
 #include "bullet.h"
 class Game;
+class Entity;
 
 class Weapon {
 private:
     Game* game;
+    Entity* owner;
     WeaponData data;
 
     bool shooting = false;
@@ -16,7 +19,7 @@ private:
     std::vector<Bullet*> bullets;
 
 public:
-    Weapon(Game* game, WeaponData data);
+    Weapon(Game* game, Entity* owner, WeaponData data);
     ~Weapon();
 
     void update();

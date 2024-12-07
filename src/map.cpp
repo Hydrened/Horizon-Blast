@@ -2,19 +2,44 @@
 
 // INIT
 Map::Map(Game* g) : game(g) {
+    static GameData* gameData = game->getData();
+
     loadData();
 
-    BulletData bulletData = BulletData();
-    bulletData.damage = 1.0f;
-    bulletData.speed = 2.0f;
-    bulletData.rebound = 10;
+    BulletData pbd1 = BulletData();
+    pbd1.damage = 1.0f;
+    pbd1.speed = 3.0f;
+    pbd1.rebound = 1;
+    pbd1.angle = 0.0f;
 
-    WeaponData weaponData = WeaponData();
-    weaponData.delay = 100;
-    weaponData.bullets = { bulletData };
+    BulletData pbd2 = BulletData(pbd1);
+    pbd2.angle = 10.0f;
 
-    Weapon* weapon = new Weapon(g, weaponData);
-    player = new Player(g, weapon);
+    BulletData pbd3 = BulletData(pbd1);
+    pbd3.angle = -10.0f;
+
+    WeaponData pwd = WeaponData();
+    pwd.delay = 500;
+    pwd.bullets = { pbd1, pbd2, pbd3 };
+
+    player = new Player(g, gameData->positions->player);
+
+    Weapon* playerWeapon = new Weapon(g, player, pwd);
+    player->setWeapon(playerWeapon);
+
+
+
+    std::vector<LevelPos> enemyPositions = { { 5.0f, 3.0f } };
+    for (LevelPos ePos : enemyPositions) {
+        Enemy* enemy = new Enemy(g, ePos);
+
+        WeaponData ewd = WeaponData(pwd);
+        ewd.bullets = { pbd1 };
+        Weapon* enemyWeapon = new Weapon(g, enemy, ewd);
+        enemy->setWeapon(enemyWeapon);
+
+        enemies.push_back(enemy);
+    }
 }
 
 void Map::loadData() {
@@ -31,12 +56,22 @@ void Map::loadData() {
 
 // CLEANUP
 Map::~Map() {
-
+    delete player;
+    for (Enemy* e : enemies) delete e;
+    enemies.clear();
+    for (Item* i : items) delete i;
+    items.clear();
+    for (const auto& [key, value] : levels) {
+        delete value;
+        levels[key] = nullptr;
+    }
+    levels.clear();
 }
 
 // UPDATE
 void Map::update() {
     player->update();
+    for (Enemy* e : enemies) e->update();
 }
 
 // RENDER
@@ -65,10 +100,11 @@ void Map::render() {
     }
 
     player->render();
+    for (Enemy* e : enemies) e->render();
 }
 
 // GETTER
-Player* Map::getPlayer() {
+Player* Map::getPlayer() const {
     return player;
 }
 

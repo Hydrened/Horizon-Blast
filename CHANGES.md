@@ -1,3 +1,9 @@
+## HB-1.0.4
+#### ADDED
+- shot many bullets in many direction at the same time
+- enemies
+- pause state
+
 ## HB-1.0.3
 #### ADDED
 - bullet collision with walls

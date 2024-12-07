@@ -20,7 +20,7 @@ void Game::createWindow() {
         throw std::runtime_error("HB-101: Error creating window => SDL_Init failed: " + std::string(SDL_GetError()));
     }
 
-    window = SDL_CreateWindow("Horizon Blast 1.0.3", x, y, w, h, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Horizon Blast 1.0.4", x, y, w, h, SDL_WINDOW_SHOWN);
     if (!window) {
         SDL_Quit();
         throw std::runtime_error("HB-102: Error creating window => SDL_CreateWindow failed: " + std::string(SDL_GetError()));
@@ -86,7 +86,15 @@ void Game::handleEvents(SDL_Event event) {
         case SDL_KEYDOWN:
             keyPressed[event.key.keysym.sym] = true;
             switch (event.key.keysym.sym) {
-                case SDLK_ESCAPE: quit(); break;
+                case SDLK_ESCAPE: switch (state) {
+                    case PLAYING: setState(PAUSE); break;
+                    case PAUSE: quit(); break;
+                    default: break;
+                } break;
+                case SDLK_SPACE: switch (state) {
+                    case PAUSE: setState(PLAYING); break;
+                    default: break;
+                } break;
                 default: break;
             } break;
         case SDL_KEYUP: keyPressed[event.key.keysym.sym] = false; break;
@@ -114,36 +122,41 @@ void Game::render() {
 }
 
 // GETTER
-H2DE_Engine* Game::getEngine() {
+H2DE_Engine* Game::getEngine() const {
     return engine;
 }
 
-GameData* Game::getData() {
+GameData* Game::getData() const {
     return data;
 }
 
-Calculator* Game::getCalculator() {
+Calculator* Game::getCalculator() const {
     return calculator;
 }
 
-Camera* Game::getCamera() {
+Camera* Game::getCamera() const {
     return camera;
 }
 
-Map* Game::getMap() {
+Map* Game::getMap() const {
     return map;
 }
 
-GameState Game::getState() {
+GameState Game::getState() const {
     return state;
 }
 
-std::vector<SDL_Keycode> Game::getPressedKeys() {
+std::vector<SDL_Keycode> Game::getPressedKeys() const {
     std::vector<SDL_Keycode> res;
     for (const auto& [key, value] : keyPressed) if (value) res.push_back(key);
     return res;
 }
 
-H2DE_Pos Game::getMousePos() {
+H2DE_Pos Game::getMousePos() const {
     return mousePos;
+}
+
+// SETTER
+void Game::setState(GameState s) {
+    state = s;
 }

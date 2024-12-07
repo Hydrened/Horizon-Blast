@@ -1,7 +1,8 @@
 #ifndef DATA_H
 #define DATA_H
 
-#define BLOCKS_ON_WIDTH 20
+#define BLOCKS_ON_WIDTH 20.0f
+#define BLOCKS_ON_HEIGHT 11.25f
 
 struct GameData {
     struct Positions {
@@ -10,10 +11,11 @@ struct GameData {
     };
 
     struct Sizes {
-        LevelSize player = { 1.0f, 1.0f };
+        LevelSize player = { 0.75f, 0.75f };
+        LevelSize enemy = { 0.75f, 0.75f };
         LevelSize item = { 1.0f, 1.0f };
         LevelSize bullet = { 0.2f, 0.2f };
-        LevelSize map = { 100.0f, 100.0f };
+        LevelSize map = { 50.0f, 50.0f };
         float cameraPadding = 3.0f;
     };
 

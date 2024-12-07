@@ -14,9 +14,9 @@ public:
     Camera(Game* game);
     ~Camera();
 
-    void update();
+    bool contains(LevelRect element);
 
-    LevelPos getPos();
+    LevelPos getPos() const;
     void setPos(LevelPos pos);
 };
 

@@ -2,7 +2,6 @@
 #define GAME_H
 
 #include <H2DE/H2DE.h>
-// #include <variant>
 #include "utils.h"
 #include "data.h"
 #include "functions.h"
@@ -44,14 +43,16 @@ public:
 
     void run();
 
-    H2DE_Engine* getEngine();
-    GameData* getData();
-    Calculator* getCalculator();
-    Camera* getCamera();
-    Map* getMap();
-    GameState getState();
-    std::vector<SDL_Keycode> getPressedKeys();
-    H2DE_Pos getMousePos();
+    H2DE_Engine* getEngine() const;
+    GameData* getData() const;
+    Calculator* getCalculator() const;
+    Camera* getCamera() const;
+    Map* getMap() const;
+    GameState getState() const;
+    std::vector<SDL_Keycode> getPressedKeys() const;
+    H2DE_Pos getMousePos() const;
+
+    void setState(GameState state);
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "weapon.h"
 
 // INIT
-Weapon::Weapon(Game* g, WeaponData d) : game(g), data(d) {
+Weapon::Weapon(Game* g, Entity* o, WeaponData d) : game(g), owner(o), data(d) {
 
 }
 
@@ -12,11 +12,8 @@ Weapon::~Weapon() {
 
 // UPDATE
 void Weapon::update() {
-    static Calculator* c = game->getCalculator();
-
-    H2DE_Pos mousePos = game->getMousePos();
     if (shooting && SDL_GetTicks() - lastShot >= data.delay) {
-        shot(c->computePxPos(mousePos.x, mousePos.y));
+        shot(owner->getTarget());
         lastShot = SDL_GetTicks();
     }
 
@@ -29,16 +26,16 @@ void Weapon::render() {
 }
 
 // EVENTS
-void Weapon::shot(LevelPos pos) {
-    static Player* player = game->getMap()->getPlayer();
+void Weapon::shot(LevelPos target) {
     static float bulletRange = game->getData()->physics->bulletRange;
 
-    LevelPos playerPos = player->getPos();
-    double angle = std::atan2(pos.y - playerPos.y, pos.x - playerPos.x);
+    LevelPos source = owner->getPos();
+    float targetAngle = std::atan2(target.y - source.y, target.x - source.x) * 180.0f / M_PI;
 
     for (BulletData bData : data.bullets) {
+        double angle = (targetAngle - bData.angle) * (M_PI / 180.0f);
         LevelVelocity bulletVelocity = { static_cast<float>(std::cos(angle)) / 10.0f, static_cast<float>(std::sin(angle)) / 10.0f };
-        bullets.push_back(new Bullet(game, bData, playerPos, bulletVelocity));
+        bullets.push_back(new Bullet(game, this, bData, source, bulletVelocity));
     }
 }
 

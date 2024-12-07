@@ -1,9 +1,35 @@
-#include "player.h"
+#include "entity.h"
 
+// ENTITY
 // INIT
-Player::Player(Game* g, Weapon* w) : game(g), weapon(w) {
-    static GameData* gameData = game->getData();
-    pos = gameData->positions->player;
+Entity::Entity(Game* g, LevelPos p) : game(g), pos(p) {
+
+}
+
+// CLEANUP
+Entity::~Entity() {
+    delete weapon;
+}
+
+// GETTER
+LevelPos Entity::getPos() const {
+    return pos;
+}
+
+Weapon* Entity::getWeapon() const {
+    return weapon;
+}
+
+LevelPos Entity::getTarget() const {
+    return target;
+}
+
+
+
+// PLAYER
+// INIT
+Player::Player(Game* g, LevelPos p) : Entity(g, p) {
+
 }
 
 // CLEANUP
@@ -13,10 +39,10 @@ Player::~Player() {
 
 // UPDATE
 void Player::update() {
+    static Calculator* c = game->getCalculator();
     static Camera* camera = game->getCamera();
     static GameData* gameData = game->getData();
 
-    static float BLOCKS_ON_HEIGHT = BLOCKS_ON_WIDTH * 9 / 16;
     static float speed = gameData->physics->playerSpeed;
     static float camPadding = gameData->sizes->cameraPadding;
     static LevelSize playerSize = gameData->sizes->player;
@@ -57,6 +83,8 @@ void Player::update() {
     camera->setPos(camPos);
 
     // 4 => Weapon
+    H2DE_Pos mousePos = game->getMousePos();
+    target = c->computePxPos(mousePos.x, mousePos.y);
     weapon->update();
 }
 
@@ -77,7 +105,7 @@ void Player::render() {
         { size, size },
         { 0, size },
     };
-    a->rgb = { 255, 0, 0, 255 };
+    a->rgb = { 0, 255, 0, 255 };
     a->filled = true;
     a->index = 10;
     H2DE_AddGraphicObject(engine, a);
@@ -85,16 +113,61 @@ void Player::render() {
     weapon->render();
 }
 
-// GETTER
-LevelPos Player::getPos() {
-    return pos;
-}
-
-Weapon* Player::getWeapon() {
-    return weapon;
-}
-
 // SETTER
 void Player::setShooting(bool value) {
     weapon->setShooting(value);
+}
+
+void Player::setWeapon(Weapon* w) {
+    weapon = w;
+}
+
+
+
+// ENEMY
+// INIT
+Enemy::Enemy(Game* g, LevelPos p) : Entity(g, p) {
+    
+}
+
+// CLEANUP
+Enemy::~Enemy() {
+
+}
+
+// UPDATE
+void Enemy::update() {
+    target = game->getMap()->getPlayer()->getPos();
+    weapon->update();
+}
+
+// RENDER
+void Enemy::render() {
+    static H2DE_Engine* engine = game->getEngine();
+    static Calculator* c = game->getCalculator();
+    static GameData* gameData = game->getData();
+
+    static int size = c->convertToPx(gameData->sizes->enemy).w;
+
+    H2DE_GraphicObject* a = H2DE_CreateGraphicObject();
+    a->type = POLYGON;
+    a->pos = c->convertToPx(pos, gameData->sizes->enemy);
+        a->points = {
+        { 0, 0 },
+        { size, 0 },
+        { size, size },
+        { 0, size },
+    };
+    a->rgb = { 255, 0, 0, 255 };
+    a->filled = true;
+    a->index = 11;
+    H2DE_AddGraphicObject(engine, a);
+
+    weapon->render();
+}
+
+// SETTER
+void Enemy::setWeapon(Weapon* w) {
+    weapon = w;
+    weapon->setShooting(true);
 }

@@ -11,8 +11,14 @@ Camera::~Camera() {
 
 }
 
+// OTHER
+bool Camera::contains(LevelRect element) {
+    LevelRect cameraRect = getRect(pos, { BLOCKS_ON_WIDTH, BLOCKS_ON_HEIGHT });
+    return element.intersect(cameraRect);
+}
+
 // GETTER
-LevelPos Camera::getPos() {
+LevelPos Camera::getPos() const {
     return pos;
 }
 
