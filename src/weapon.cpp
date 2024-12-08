@@ -12,12 +12,15 @@ Weapon::~Weapon() {
 
 // UPDATE
 void Weapon::update() {
-    if (shooting && SDL_GetTicks() - lastShot >= data.delay) {
-        shot(owner->getTarget());
-        lastShot = SDL_GetTicks();
-    }
+    if (game->getState() == PLAYING) {
+        if (shooting && delayFrameCount >= game->getNbStep(data.delay)) {
+            shot(owner->getTarget());
+            delayFrameCount = 0;
+        }
 
-    for (Bullet* bullet : bullets) bullet->update();
+        for (Bullet* bullet : bullets) bullet->update();
+        delayFrameCount++;
+    }
 }
 
 // RENDER
@@ -41,6 +44,11 @@ void Weapon::shot(LevelPos target) {
 
 void Weapon::destroyBullet(Bullet* bullet) {
     bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet), bullets.end());
+}
+
+// GETTER
+bool Weapon::areShotsFinished() const {
+    return bullets.size() == 0;
 }
 
 // SETTER

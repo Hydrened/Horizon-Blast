@@ -7,22 +7,25 @@ Map::Map(Game* g) : game(g) {
     loadData();
 
     BulletData pbd1 = BulletData();
+    pbd1.canDamage = ENEMY;
     pbd1.damage = 1.0f;
     pbd1.speed = 3.0f;
     pbd1.rebound = 1;
     pbd1.angle = 0.0f;
 
     BulletData pbd2 = BulletData(pbd1);
-    pbd2.angle = 10.0f;
+    pbd2.angle = 5.0f;
 
     BulletData pbd3 = BulletData(pbd1);
-    pbd3.angle = -10.0f;
+    pbd3.angle = -5.0f;
 
     WeaponData pwd = WeaponData();
     pwd.delay = 500;
     pwd.bullets = { pbd1, pbd2, pbd3 };
 
-    player = new Player(g, gameData->positions->player);
+    EntityData playerData = { 10.0f, gameData->positions->player };
+    player = new Player(g, playerData);
+    entities.push_back(player);
 
     Weapon* playerWeapon = new Weapon(g, player, pwd);
     player->setWeapon(playerWeapon);
@@ -31,14 +34,18 @@ Map::Map(Game* g) : game(g) {
 
     std::vector<LevelPos> enemyPositions = { { 5.0f, 3.0f } };
     for (LevelPos ePos : enemyPositions) {
-        Enemy* enemy = new Enemy(g, ePos);
+        EntityData enemyData = { 10.0f, ePos };
+        Enemy* enemy = new Enemy(g, enemyData);
 
         WeaponData ewd = WeaponData(pwd);
-        ewd.bullets = { pbd1 };
+        BulletData ebd = BulletData(pbd1);
+        ebd.canDamage = PLAYER;
+        ebd.speed = 1.0f;
+        ewd.bullets = { ebd };
         Weapon* enemyWeapon = new Weapon(g, enemy, ewd);
         enemy->setWeapon(enemyWeapon);
 
-        enemies.push_back(enemy);
+        entities.push_back(enemy);
     }
 }
 
@@ -56,9 +63,8 @@ void Map::loadData() {
 
 // CLEANUP
 Map::~Map() {
-    delete player;
-    for (Enemy* e : enemies) delete e;
-    enemies.clear();
+    for (Entity* e : entities) delete e;
+    entities.clear();
     for (Item* i : items) delete i;
     items.clear();
     for (const auto& [key, value] : levels) {
@@ -70,8 +76,7 @@ Map::~Map() {
 
 // UPDATE
 void Map::update() {
-    player->update();
-    for (Enemy* e : enemies) e->update();
+    for (Entity* e : entities) e->update();
 }
 
 // RENDER
@@ -99,8 +104,13 @@ void Map::render() {
         H2DE_AddGraphicObject(engine, i);
     }
 
-    player->render();
-    for (Enemy* e : enemies) e->render();
+    for (Entity* e : entities) e->render();
+}
+
+// EVENTS
+void Map::destroyEntity(Entity* entity) {
+    auto it = std::find(entities.begin(), entities.end(), entity);
+    if (it != entities.end()) entities.erase(it);
 }
 
 // GETTER
@@ -110,4 +120,8 @@ Player* Map::getPlayer() const {
 
 std::vector<Item*>* Map::getItems() {
     return &items;
+}
+
+std::vector<Entity*>* Map::getEntities() {
+    return &entities;
 }

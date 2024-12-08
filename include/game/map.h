@@ -4,8 +4,8 @@
 #include "game.h"
 #include "entity.h"
 class Game;
+class Entity;
 class Player;
-class Enemy;
 
 class Map {
 private:
@@ -14,7 +14,7 @@ private:
     std::unordered_map<unsigned int, LevelData*> levels;
     std::vector<Item*> items;
     Player* player;
-    std::vector<Enemy*> enemies;
+    std::vector<Entity*> entities;
 
     void loadData();
 
@@ -25,8 +25,11 @@ public:
     void update();
     void render();
 
+    void destroyEntity(Entity* entity);
+
     Player* getPlayer() const;
     std::vector<Item*>* getItems();
+    std::vector<Entity*>* getEntities();
 };
 
 #endif

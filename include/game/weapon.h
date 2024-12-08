@@ -14,7 +14,7 @@ private:
     WeaponData data;
 
     bool shooting = false;
-    Uint32 lastShot = SDL_MIN_UINT32;
+    unsigned int delayFrameCount = UINT_MAX;
 
     std::vector<Bullet*> bullets;
 
@@ -27,6 +27,8 @@ public:
 
     void shot(LevelPos pos);
     void destroyBullet(Bullet* bullet);
+
+    bool areShotsFinished() const;
 
     void setShooting(bool value);
 };

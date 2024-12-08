@@ -16,11 +16,12 @@ struct GameData {
         LevelSize item = { 1.0f, 1.0f };
         LevelSize bullet = { 0.2f, 0.2f };
         LevelSize map = { 50.0f, 50.0f };
+        LevelSize healthBar = { 1.0f, 0.2f };
         float cameraPadding = 3.0f;
     };
 
     struct Offsets {
-
+        LevelOffset healthBar = { 0.0f, 0.7f };
     };
 
     struct Physics {

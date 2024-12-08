@@ -20,7 +20,7 @@ void Game::createWindow() {
         throw std::runtime_error("HB-101: Error creating window => SDL_Init failed: " + std::string(SDL_GetError()));
     }
 
-    window = SDL_CreateWindow("Horizon Blast 1.0.4", x, y, w, h, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Horizon Blast 1.0.5", x, y, w, h, SDL_WINDOW_SHOWN);
     if (!window) {
         SDL_Quit();
         throw std::runtime_error("HB-102: Error creating window => SDL_CreateWindow failed: " + std::string(SDL_GetError()));
@@ -122,6 +122,10 @@ void Game::render() {
 }
 
 // GETTER
+unsigned int Game::getNbStep(unsigned int ms) const {
+    return static_cast<unsigned int>(ms / 1000.0f * FPS);
+}
+
 H2DE_Engine* Game::getEngine() const {
     return engine;
 }

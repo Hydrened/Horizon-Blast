@@ -1,3 +1,11 @@
+## HB-1.0.5
+#### ADDED
+- health bar
+- damage dealing
+- killing enemies
+#### FIXED
+- only rendering items on screen
+
 ## HB-1.0.4
 #### ADDED
 - shot many bullets in many direction at the same time

@@ -43,6 +43,7 @@ public:
 
     void run();
 
+    unsigned int getNbStep(unsigned int ms) const;
     H2DE_Engine* getEngine() const;
     GameData* getData() const;
     Calculator* getCalculator() const;
