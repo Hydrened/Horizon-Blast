@@ -49,6 +49,7 @@ void Bullet::update() {
 
         // 4 => Check canDamage collisions
         for (Entity* entity : *(game->getMap()->getEntities())) {
+            if (entity->isDead()) continue;
             LevelRect entityRect = getRect(entity->getPos(), entity->getSize());
             if (!bulletRect.intersect(entityRect, velocity)) continue;
 

@@ -2,76 +2,47 @@
 
 // INIT
 Map::Map(Game* g) : game(g) {
-    static GameData* gameData = game->getData();
-
-    loadData();
-
-    BulletData pbd1 = BulletData();
-    pbd1.canDamage = ENEMY;
-    pbd1.damage = 1.0f;
-    pbd1.speed = 3.0f;
-    pbd1.rebound = 1;
-    pbd1.angle = 0.0f;
-
-    BulletData pbd2 = BulletData(pbd1);
-    pbd2.angle = 5.0f;
-
-    BulletData pbd3 = BulletData(pbd1);
-    pbd3.angle = -5.0f;
-
-    WeaponData pwd = WeaponData();
-    pwd.delay = 500;
-    pwd.bullets = { pbd1, pbd2, pbd3 };
-
-    EntityData playerData = { 10.0f, gameData->positions->player };
-    player = new Player(g, playerData);
-    entities.push_back(player);
-
-    Weapon* playerWeapon = new Weapon(g, player, pwd);
-    player->setWeapon(playerWeapon);
-
-
-
-    std::vector<LevelPos> enemyPositions = { { 5.0f, 3.0f } };
-    for (LevelPos ePos : enemyPositions) {
-        EntityData enemyData = { 10.0f, ePos };
-        Enemy* enemy = new Enemy(g, enemyData);
-
-        WeaponData ewd = WeaponData(pwd);
-        BulletData ebd = BulletData(pbd1);
-        ebd.canDamage = PLAYER;
-        ebd.speed = 1.0f;
-        ewd.bullets = { ebd };
-        Weapon* enemyWeapon = new Weapon(g, enemy, ewd);
-        enemy->setWeapon(enemyWeapon);
-
-        entities.push_back(enemy);
-    }
+    initPlayer();
+    openLevel(1);
 }
 
-void Map::loadData() {
-    json* levels = H2DE_Json::read("data/levels.json");
-    json level = (*levels)["0"];
+void Map::initPlayer() {
+    static GameData* gameData = game->getData();
 
-    for (json i : level) {
-        Item* item = new Item();
-        item->type = i["t"];
-        item->pos = { i["x"], i["y"] };
-        items.push_back(item);
-    }
+    EntityData playerData = { 10.0f, gameData->positions->player };
+    player = new Player(game, playerData);
+    entities.push_back(player);
+
+    WeaponData weaponData = WeaponData();
+    weaponData.delay = 500;
+
+    BulletData bulletData1 = BulletData();
+    bulletData1.canDamage = ENEMY;
+    bulletData1.damage = 1.0f;
+    bulletData1.speed = 3.0f;
+    bulletData1.rebound = 1;
+    bulletData1.angle = 0.0f;
+    weaponData.bullets.push_back(bulletData1);
+
+    BulletData bulletData2 = BulletData(bulletData1);
+    bulletData2.angle = 5.0f;
+    weaponData.bullets.push_back(bulletData2);
+
+    BulletData bulletData3 = BulletData(bulletData1);
+    bulletData3.angle = -5.0f;
+    weaponData.bullets.push_back(bulletData3);
+
+    Weapon* weapon = new Weapon(game, player, weaponData);
+    player->setWeapon(weapon);
 }
 
 // CLEANUP
 Map::~Map() {
     for (Entity* e : entities) delete e;
     entities.clear();
+    
     for (Item* i : items) delete i;
     items.clear();
-    for (const auto& [key, value] : levels) {
-        delete value;
-        levels[key] = nullptr;
-    }
-    levels.clear();
 }
 
 // UPDATE
@@ -108,6 +79,59 @@ void Map::render() {
 }
 
 // EVENTS
+void Map::openLevel(unsigned int id) {
+    static GameData* gameData = game->getData();
+
+    for (const Item* item : items) delete item;
+    items.clear();
+
+    for (Entity* entity : entities) {
+        Enemy* enemy = EntityCaster::castToEnemy(entity);
+        if (enemy) delete enemy;
+    }
+
+    game->getCamera()->setPos(gameData->positions->camera);
+    player->resetPos();
+    player->getWeapon()->reset();
+
+    std::cout << "Opening level " << id << std::endl;
+    levelID = id;
+    json* levels = H2DE_Json::read("data/levels.json");
+    json level = (*levels)[std::to_string(id)];
+
+    for (json i : level["items"]) {
+        Item* item = new Item();
+        item->type = i["t"];
+        item->pos = { i["x"], i["y"] };
+        items.push_back(item);
+    }
+
+    for (json e : level["enemies"]) {
+        EntityData enemyData = { e["health"], { e["pos"]["x"], e["pos"]["y"] } };
+        Enemy* enemy = new Enemy(game, enemyData);
+        entities.push_back(enemy);
+
+        json w = e["weapon"];
+        WeaponData weaponData = WeaponData();
+        weaponData.delay = w["delay"];
+
+        for (json bullet : w["bullets"]) {
+            BulletData bulletData = BulletData();
+            bulletData.canDamage = PLAYER;
+            bulletData.speed = bullet["speed"];
+            bulletData.damage = bullet["damage"];
+            bulletData.rebound = bullet["rebound"];
+            bulletData.pierce = bullet["pierce"];
+            bulletData.explosive = bullet["explosive"];
+            bulletData.angle = bullet["angle"];
+            weaponData.bullets.push_back(bulletData);
+        }
+
+        Weapon* weapon = new Weapon(game, enemy, weaponData);
+        enemy->setWeapon(weapon);
+    }
+}
+
 void Map::destroyEntity(Entity* entity) {
     auto it = std::find(entities.begin(), entities.end(), entity);
     if (it != entities.end()) entities.erase(it);
@@ -124,4 +148,8 @@ std::vector<Item*>* Map::getItems() {
 
 std::vector<Entity*>* Map::getEntities() {
     return &entities;
+}
+
+unsigned int Map::getCurrentLevelId() {
+    return levelID;
 }

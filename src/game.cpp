@@ -20,7 +20,7 @@ void Game::createWindow() {
         throw std::runtime_error("HB-101: Error creating window => SDL_Init failed: " + std::string(SDL_GetError()));
     }
 
-    window = SDL_CreateWindow("Horizon Blast 1.0.5", x, y, w, h, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Horizon Blast 1.0.6", x, y, w, h, SDL_WINDOW_SHOWN);
     if (!window) {
         SDL_Quit();
         throw std::runtime_error("HB-102: Error creating window => SDL_CreateWindow failed: " + std::string(SDL_GetError()));
@@ -95,6 +95,8 @@ void Game::handleEvents(SDL_Event event) {
                     case PAUSE: setState(PLAYING); break;
                     default: break;
                 } break;
+                case SDLK_a: map->openLevel(static_cast<unsigned int>(std::min(static_cast<int>(map->getCurrentLevelId()) + 1, 100))); break;
+                case SDLK_z: map->openLevel(static_cast<unsigned int>(std::max(static_cast<int>(map->getCurrentLevelId()) - 1, 1))); break;
                 default: break;
             } break;
         case SDL_KEYUP: keyPressed[event.key.keysym.sym] = false; break;

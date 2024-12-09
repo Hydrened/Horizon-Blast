@@ -69,6 +69,10 @@ void Entity::decreaseHealth(float damage) {
     if (health == 0.0f) kill();
 }
 
+void Entity::resetPos() {
+    pos = data.pos;
+}
+
 // GETTER
 LevelPos Entity::getPos() const {
     return pos;
@@ -82,6 +86,10 @@ LevelPos Entity::getTarget() const {
     return target;
 }
 
+bool Entity::isDead() const {
+    return dead;
+}
+
 
 
 // PLAYER
@@ -89,6 +97,7 @@ LevelPos Entity::getTarget() const {
 Player::Player(Game* g, EntityData d) : Entity(g, d) {
 
 }
+
 // CLEANUP
 Player::~Player() {
 
@@ -210,6 +219,7 @@ void Player::setWeapon(Weapon* w) {
 Enemy::Enemy(Game* g, EntityData d) : Entity(g, d) {
 
 }
+
 // CLEANUP
 Enemy::~Enemy() {
     game->getMap()->destroyEntity(this);
@@ -218,8 +228,8 @@ Enemy::~Enemy() {
 // UPDATE
 void Enemy::update() {
     if (!dead) target = game->getMap()->getPlayer()->getPos();
+    else if (weapon->areShotsFinished()) delete this;
     weapon->update();
-    if (weapon->areShotsFinished()) delete this;
 }
 
 // RENDER

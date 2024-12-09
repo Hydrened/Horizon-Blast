@@ -11,12 +11,12 @@ class Map {
 private:
     Game* game;
 
-    std::unordered_map<unsigned int, LevelData*> levels;
     std::vector<Item*> items;
     Player* player;
     std::vector<Entity*> entities;
+    unsigned int levelID;
 
-    void loadData();
+    void initPlayer();
 
 public:
     Map(Game* game);
@@ -25,11 +25,13 @@ public:
     void update();
     void render();
 
+    void openLevel(unsigned int id);
     void destroyEntity(Entity* entity);
 
     Player* getPlayer() const;
     std::vector<Item*>* getItems();
     std::vector<Entity*>* getEntities();
+    unsigned int getCurrentLevelId();
 };
 
 #endif

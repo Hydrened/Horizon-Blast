@@ -29,6 +29,14 @@ void Weapon::render() {
 }
 
 // EVENTS
+void Weapon::reset() {
+    shooting = false;
+    delayFrameCount = UINT_MAX;
+
+    for (Bullet* bullet : bullets) destroyBullet(bullet);
+    bullets.clear();
+}
+
 void Weapon::shot(LevelPos target) {
     static float bulletRange = game->getData()->physics->bulletRange;
 

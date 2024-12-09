@@ -1,12 +1,12 @@
 #ifndef DATA_H
 #define DATA_H
 
-#define BLOCKS_ON_WIDTH 20.0f
-#define BLOCKS_ON_HEIGHT 11.25f
+#define BLOCKS_ON_WIDTH 40.0f
+#define BLOCKS_ON_HEIGHT 22.5f
 
 struct GameData {
     struct Positions {
-        LevelPos camera = { -10.0f, -3.5f };
+        LevelPos camera = { -10.0f, -11.25f };
         LevelPos player = { 0.0f, 0.0f };
     };
 

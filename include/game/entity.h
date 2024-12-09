@@ -32,11 +32,13 @@ public:
     
     void decreaseHealth(float damage);
     virtual void kill() = 0;
+    void resetPos();
 
     LevelPos getPos() const;
     virtual LevelSize getSize() = 0;
     Weapon* getWeapon() const;
     LevelPos getTarget() const;
+    bool isDead() const;
 
     virtual void setWeapon(Weapon* weapon) = 0;
 };

@@ -25,6 +25,7 @@ public:
     void update();
     void render();
 
+    void reset();
     void shot(LevelPos pos);
     void destroyBullet(Bullet* bullet);
 

@@ -1,3 +1,9 @@
+## HB-1.0.6
+#### ADDED
+- level system
+#### FIXED
+- bullet collision with dead enemies
+
 ## HB-1.0.5
 #### ADDED
 - health bar
