@@ -20,7 +20,7 @@ void Game::createWindow() {
         throw std::runtime_error("HB-101: Error creating window => SDL_Init failed: " + std::string(SDL_GetError()));
     }
 
-    window = SDL_CreateWindow("Horizon Blast 1.0.6", x, y, w, h, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("Horizon Blast 1.0.7", x, y, w, h, SDL_WINDOW_SHOWN);
     if (!window) {
         SDL_Quit();
         throw std::runtime_error("HB-102: Error creating window => SDL_CreateWindow failed: " + std::string(SDL_GetError()));

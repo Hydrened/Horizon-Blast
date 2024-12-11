@@ -1,3 +1,7 @@
+## HB-1.0.7
+#### ADDED
+- next level when all enemies are killed
+
 ## HB-1.0.6
 #### ADDED
 - level system

@@ -153,3 +153,11 @@ std::vector<Entity*>* Map::getEntities() {
 unsigned int Map::getCurrentLevelId() {
     return levelID;
 }
+
+bool Map::areAllEnemyDead() {
+    return std::count_if(entities.begin(), entities.end(), [](Entity* entity) {
+        Enemy* enemy = EntityCaster::castToEnemy(entity);
+        if (enemy) return !entity->isDead();
+        else return false;
+    }) == 0;
+}

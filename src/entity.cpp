@@ -194,7 +194,8 @@ void Player::renderHealthBar() {
 
 // EVENTS
 void Player::kill() {
-
+    dead = true;
+    game->setState(DEAD);
 }
 
 // GETTER
@@ -275,6 +276,11 @@ void Enemy::renderHealthBar() {
 void Enemy::kill() {
     dead = true;
     weapon->setShooting(false);
+
+    if (game->getMap()->areAllEnemyDead()) {
+        Map* map = game->getMap();
+        map->openLevel(map->getCurrentLevelId() + 1);
+    }
 }
 
 // GETTER

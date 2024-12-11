@@ -9,6 +9,7 @@ enum GameState {
     MENU,
     PLAYING,
     PAUSE,
+    DEAD,
 };
 
 enum ItemType {

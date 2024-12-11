@@ -32,6 +32,7 @@ public:
     std::vector<Item*>* getItems();
     std::vector<Entity*>* getEntities();
     unsigned int getCurrentLevelId();
+    bool areAllEnemyDead();
 };
 
 #endif
